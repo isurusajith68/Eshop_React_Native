@@ -7,8 +7,8 @@ node_modules/
 .expo/
 dist/
 web-build/
-backend/.env/*
-backend/node_modules
+.env
+
 
 # Native
 *.orig.*

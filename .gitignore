@@ -8,6 +8,7 @@ node_modules/
 dist/
 web-build/
 backend/.env
+backend/.env.local
 backend/node_modules
 
 # Native
@@ -31,7 +32,7 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+backend/.env
 
 # typescript
 *.tsbuildinfo

@@ -25,6 +25,7 @@ const useFetch = () => {
   }, []);
 
   const refetch = () => {
+    a;
     fetchData();
     setLoading(true);
   };

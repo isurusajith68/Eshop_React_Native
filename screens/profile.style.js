@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   button: {
-    minWidth: 150,
+    minWidth: 250,
     height: 40,
     borderWidth: 1,
     borderRadius: 25,
@@ -42,6 +42,28 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "bold",
     color: COLORS.primary,
+  },
+  menuWrapper: {
+    marginTop: SIZES.large,
+    width: SIZES.width - SIZES.large,
+    backgroundColor: COLORS.lightWhite,
+    borderRadius: 10,
+  },
+  menuItem: (borderBottomWidth) => ({
+    borderBottomWidth: borderBottomWidth,
+    flexDirection: "row",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderColor: COLORS.gray,
+  }),
+  menuItemText: {
+    fontFamily: "PoppinsRegular",
+    color: COLORS.gray,
+    marginLeft: 20,
+    fontWeight: "600",
+    fontSize: 14,
+    lineHeight: 26,
+    marginTop: 2,
   },
 });
 

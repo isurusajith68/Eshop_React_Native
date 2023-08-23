@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollView } from "react-native";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import BackBtn from "../components/backBtn/backBtn";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./login.style";
@@ -11,51 +11,58 @@ import {
   MaterialCommunityIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
-import { Formik } from "formik";
+import { Formik, formik } from "formik";
 import * as Yup from "yup";
 import { TextInput } from "react-native";
-import { COLORS } from "../constants";
+import { COLORS, SIZES } from "../constants";
 import { Alert } from "react-native";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-const SigninSchema = Yup.object().shape({
+const SignupSchema = Yup.object().shape({
   password: Yup.string()
-    .min(5, "Password must be at least 5 character")
+    .min(8, "Password must be at least 8 character")
     .required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
+  location: Yup.string().min(3, "Provide valid location").required("Required"),
+  username: Yup.string().min(3, "Provide valid username").required("Required"),
 });
 
-const Login = ({ navigation }) => {
+const SignUp = () => {
   const [lorder, setLoader] = useState(false);
-  const [responseData, setResponseData] = useState(null);
+  // const [response, setResponse] = useState(null);
   const [obscureText, setObscureText] = useState(true);
-
-  const login = async (values) => {
+  const navigation = useNavigation();
+  const register = async (values) => {
     setLoader(true);
 
     try {
-      const url = "http://192.168.242.112:5000/api/auth/login";
+      const url = "http://192.168.242.112:5000/api/auth/register";
       const datauser = values;
 
       const response = await axios.post(url, datauser);
 
-      if (response && response.status === 200) {
+      if (response && response.status === 401) {
         setLoader(false);
-        const responseData = response;
-
-        await AsyncStorage.setItem(
-          `User${responseData.data._id}`,
-          JSON.stringify(responseData.data)
-        );
-        await AsyncStorage.setItem("id", responseData.data._id);
-        navigation.replace("Bottom navigation");
-      } else {
+        Alert.alert("Error", response.data.message, [
+          {
+            text: "OK",
+          },
+        ]);
+      }
+      if (response && response.status === 201) {
         setLoader(false);
+        Alert.alert("Success", response.data.message, [
+          {
+            text: "OK",
+            onPress: () => navigation.replace("Login"),
+          },
+        ]);
       }
     } catch (error) {
       setLoader(false);
-      Alert.alert("Error", error.response.data, [
+
+      Alert.alert("Error", error.response.data.message, [
         {
           text: "OK",
         },
@@ -64,7 +71,6 @@ const Login = ({ navigation }) => {
       setLoader(false);
     }
   };
-
   return (
     <ScrollView>
       <SafeAreaView style={{ marginHorizontal: 20 }}>
@@ -74,14 +80,16 @@ const Login = ({ navigation }) => {
             source={require("../assets/images/bk.png")}
             style={styles.image}
           />
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Register</Text>
           <Formik
             initialValues={{
               email: "",
               password: "",
+              location: "",
+              username: "",
             }}
-            validationSchema={SigninSchema}
-            onSubmit={(values) => login(values)}
+            validationSchema={SignupSchema}
+            onSubmit={(values) => register(values)}
           >
             {({
               handleChange,
@@ -94,6 +102,43 @@ const Login = ({ navigation }) => {
               setFieldTouched,
             }) => (
               <View>
+                <View style={styles.wrapper}>
+                  <Text style={styles.lable}>User Name</Text>
+                  <View
+                    style={styles.inputWrapper(
+                      touched.username ? "blue" : COLORS.black
+                    )}
+                  >
+                    <MaterialCommunityIcons
+                      name="account-outline"
+                      size={24}
+                      color="black"
+                      style={{ marginRight: 10 }}
+                    />
+                    <TextInput
+                      placeholder="Enter your username"
+                      onFocus={() => setFieldTouched("username")}
+                      onBlur={() => setFieldTouched("username", "")}
+                      autoCapitalize="none"
+                      value={values.username}
+                      onChangeText={handleChange("username")}
+                      autoCorrect={false}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  {touched.username && errors.username && (
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: 12,
+                        marginTop: 5,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {errors.username}
+                    </Text>
+                  )}
+                </View>
                 <View style={styles.wrapper}>
                   <Text style={styles.lable}>Email</Text>
                   <View
@@ -128,6 +173,43 @@ const Login = ({ navigation }) => {
                       }}
                     >
                       {errors.email}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.wrapper}>
+                  <Text style={styles.lable}>Location</Text>
+                  <View
+                    style={styles.inputWrapper(
+                      touched.location ? "blue" : COLORS.black
+                    )}
+                  >
+                    <MaterialCommunityIcons
+                      name="map-marker-outline"
+                      size={24}
+                      color="black"
+                      style={{ marginRight: 10 }}
+                    />
+                    <TextInput
+                      placeholder="Enter your location"
+                      onFocus={() => setFieldTouched("location")}
+                      onBlur={() => setFieldTouched("location", "")}
+                      autoCapitalize="none"
+                      value={values.location}
+                      onChangeText={handleChange("location")}
+                      autoCorrect={false}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  {touched.location && errors.location && (
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: 12,
+                        marginTop: 5,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {errors.location}
                     </Text>
                   )}
                 </View>
@@ -188,7 +270,7 @@ const Login = ({ navigation }) => {
                     fontSize: 15,
                   }}
                 >
-                  Don't have an account ?{" "}
+                  Already have an account ?{" "}
                   <Text
                     style={{
                       color: COLORS.primary,
@@ -196,9 +278,9 @@ const Login = ({ navigation }) => {
 
                       fontSize: 16,
                     }}
-                    onPress={() => navigation.navigate("Register")}
+                    onPress={() => navigation.navigate("Login")}
                   >
-                    Register
+                    Login
                   </Text>
                 </Text>
               </View>
@@ -209,4 +291,4 @@ const Login = ({ navigation }) => {
     </ScrollView>
   );
 };
-export default Login;
+export default SignUp;
